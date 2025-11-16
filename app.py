@@ -41,11 +41,11 @@ def predict_by_location(payload: dict):
     if row.empty:
         raise HTTPException(status_code=404, detail="Entidad o Municipio no encontrado")
 
-    # Extraer los features usados en el entrenamiento
-    features = row[["mean_ann", "std_ann", "trend_slope", "sum_all", "growth_last"]].values
+    # Extraer los features con nombres incluidos
+    features_df = row[["mean_ann", "std_ann", "trend_slope", "sum_all", "growth_last"]]
 
-    # Escalar
-    scaled = scaler.transform(features)
+    # Escalar con nombres
+    scaled = scaler.transform(features_df)
 
     # Predecir
     risk_prediction = clf.predict(scaled)[0]
