@@ -86,8 +86,9 @@ Verifica que la API esté activa.
   "status": "ok",
   "message": "API de clasificación de riesgo activa"
 }
+```
 ---
-POST /predict-by-location
+### POST /predict-by-location
 
 Permite obtener la predicción del nivel de riesgo basado en:
 
@@ -109,24 +110,43 @@ Respuesta:
   "Municipio": "NEZAHUALCÓYOTL",
   "risk_zone": 4
 }
-
-Instalación local
+```
+## Instalación local
 
 Clonar el repositorio:
 
 ```bash
 git clone https://github.com/brenelga/modelo.git
 cd modelo
-
+```
 Crear entorno virtual:
 
 ```bash
 python -m venv venv
 source venv/bin/activate
-
+```
 Instalar dependencias:
 ```bash
 pip install -r requirements.txt
+```
+
+Ejecutar API local:
+
+```bash
+uvicorn app:app --reload
+```
+
+### ☁️ Despliegue en Railway
+1. Subir este repositorio a GitHub
+2. En Railway → “New Project” → “Deploy from GitHub Repo”
+3. Configurar Start Command:
+```nginx
+uvicorn app:app --host 0.0.0.0 --port $PORT
+```
+
+Railway instala automáticamente requirements.txt.
+
+
 
 # Licencia
 Este proyecto está licenciado bajo MIT License.
