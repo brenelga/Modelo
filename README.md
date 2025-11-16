@@ -154,4 +154,5 @@ Puedes usarlo, modificarlo y distribuirlo libremente, siempre que mantengas el a
 
 # Autor
 
-JESUS BRENEL GALICIA AGUILAR
+TSU. JESUS BRENEL GALICIA AGUILAR
+Cédula Profesional: **15104776**
