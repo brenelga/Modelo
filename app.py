@@ -5,6 +5,9 @@ import unicodedata
 
 app = FastAPI()
 
+# ------------------------------
+# Normalización de nombres
+# ------------------------------
 def normalize_name(x):
     if x is None:
         return None
@@ -14,11 +17,17 @@ def normalize_name(x):
     s = " ".join(s.split())
     return s
 
+# ------------------------------
+# Carga del dataset
+# ------------------------------
 df = pd.read_csv("municipal_features_and_risk.csv")
 
 df["Entidad"] = df["Entidad"].apply(normalize_name)
 df["Municipio"] = df["Municipio"].apply(normalize_name)
 
+# ------------------------------
+# CORS
+# ------------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,12 +36,18 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+TARIFA_BASE = 200  # valor temporal
 
+
+# ============================================================
+#       ENDPOINT DE PREDICCIÓN CON CÁLCULO DE PRECIO
+# ============================================================
 @app.post("/predict-by-location")
 def predict(payload: dict):
     try:
         ent = normalize_name(payload.get("Entidad"))
         mun = normalize_name(payload.get("Municipio"))
+        vehiculos = payload.get("Vehiculos", 1)
     except:
         return {"error": "Formato inválido"}
 
@@ -50,19 +65,30 @@ def predict(payload: dict):
 
     riesgo = int(row["risk_zone"].iloc[0])
 
+    # ------------------------------
+    # Cálculo del precio
+    # ------------------------------
+    precio_por_vehiculo = TARIFA_BASE + (0.2 * TARIFA_BASE * riesgo)
+    total = 1.16 * (vehiculos * precio_por_vehiculo)
+
     return {
         "Entidad": ent,
         "Municipio": mun,
-        "Riesgo": riesgo
+        "Riesgo": riesgo,
+        "Tarifa_Base": TARIFA_BASE,
+        "Precio_Por_Vehiculo": precio_por_vehiculo,
+        "Vehiculos": vehiculos,
+        "Total": total
     }
+
 
 @app.get("/")
 def root():
     return {"status": "ML Lookup API Online"}
 
 
+# Producción
 import os
-
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
